@@ -1,3 +1,12 @@
+// ============ AUTHENTICATION STATE ============
+let currentUser = null;
+const registeredUsers = [
+  { userId: "U-201", name: "Dr. Minh Nguyen", email: "minh.nguyen@scipub.test", password: "test123", role: "Researcher", status: "Active" },
+  { userId: "U-301", name: "Linh Tran", email: "linh.tran@scipub.test", password: "test123", role: "Editor", status: "Assigned" },
+  { userId: "U-401", name: "Bao Pham", email: "bao.pham@scipub.test", password: "test123", role: "Admin", status: "Active" }
+];
+
+// ============ APPLICATION DATA ============
 const fields = [
   { id: "ai", fieldName: "Artificial Intelligence", description: "Models, automation, and research intelligence", momentum: 96 },
   { id: "medicine", fieldName: "Digital Medicine", description: "Clinical systems, diagnostics, and patient monitoring", momentum: 84 },
@@ -73,6 +82,28 @@ let savedSearches = [
 
 let selectedJournalId = journals[0].journalId;
 let activeRole = "researcher";
+
+// ============ AUTH DOM ELEMENTS ============
+const authContainer = document.querySelector("#authContainer");
+const appShell = document.querySelector("#appShell");
+const loginForm = document.querySelector("#loginForm");
+const registerForm = document.querySelector("#registerForm");
+const forgotPasswordForm = document.querySelector("#forgotPasswordForm");
+const loginFormElement = document.querySelector("#loginFormElement");
+const registerFormElement = document.querySelector("#registerFormElement");
+const forgotPasswordFormElement = document.querySelector("#forgotPasswordFormElement");
+const loginEmailInput = document.querySelector("#loginEmail");
+const loginPasswordInput = document.querySelector("#loginPassword");
+const registerNameInput = document.querySelector("#registerName");
+const registerEmailInput = document.querySelector("#registerEmail");
+const registerPasswordInput = document.querySelector("#registerPassword");
+const registerConfirmPasswordInput = document.querySelector("#registerConfirmPassword");
+const registerRoleSelect = document.querySelector("#registerRole");
+const resetEmailInput = document.querySelector("#resetEmail");
+const registerLink = document.querySelector("#registerLink");
+const forgotPasswordLink = document.querySelector("#forgotPasswordLink");
+const backToLoginLink = document.querySelector("#backToLoginLink");
+const backToLoginLink2 = document.querySelector("#backToLoginLink2");
 
 const pageTitle = document.querySelector("#pageTitle");
 const activeRoleLabel = document.querySelector("#activeRole");
@@ -331,9 +362,173 @@ function renderUsers() {
     .join("");
 }
 
+// ============ AUTHENTICATION FUNCTIONS ============
+function showAuthForm(formType) {
+  loginForm.classList.remove("active");
+  registerForm.classList.remove("active");
+  forgotPasswordForm.classList.remove("active");
+
+  if (formType === "login") {
+    loginForm.classList.add("active");
+  } else if (formType === "register") {
+    registerForm.classList.add("active");
+  } else if (formType === "forgotPassword") {
+    forgotPasswordForm.classList.add("active");
+  }
+}
+
+function showAppShell() {
+  authContainer.style.display = "none";
+  appShell.style.display = "grid";
+}
+
+function showAuthContainer() {
+  authContainer.style.display = "flex";
+  appShell.style.display = "none";
+}
+
+function loginUser(email, password) {
+  const user = registeredUsers.find((u) => u.email === email && u.password === password);
+  if (user) {
+    currentUser = { ...user };
+    activeRole = user.role.toLowerCase();
+    showAppShell();
+    renderFieldOptions();
+    renderChart();
+    renderFields();
+    renderJournals();
+    renderTrendTable();
+    renderSavedSearches();
+    renderEditorJournals();
+    renderUsers();
+    applyRole(activeRole);
+    activeRoleLabel.textContent = user.role;
+    document.querySelector(".user-chip strong").textContent = user.name.split(" ")[0];
+    showNotification("Login successful!");
+    return true;
+  }
+  return false;
+}
+
+function registerUser(name, email, password, confirmPassword, role) {
+  // Validation
+  if (password !== confirmPassword) {
+    showNotification("Passwords do not match!", "error");
+    return false;
+  }
+
+  if (registeredUsers.some((u) => u.email === email)) {
+    showNotification("Email already registered!", "error");
+    return false;
+  }
+
+  // Create new user
+  const newUser = {
+    userId: `U-${400 + registeredUsers.length}`,
+    name: name,
+    email: email,
+    password: password,
+    role: role.charAt(0).toUpperCase() + role.slice(1),
+    status: "Active"
+  };
+
+  registeredUsers.push(newUser);
+  users.push(newUser);
+  showNotification("Account created successfully! Please login.");
+  showAuthForm("login");
+  return true;
+}
+
+function resetPassword(email) {
+  const user = registeredUsers.find((u) => u.email === email);
+  if (user) {
+    // In a real app, send email with reset link
+    showNotification("Password reset link sent to " + email);
+    showAuthForm("login");
+    return true;
+  } else {
+    showNotification("Email not found!", "error");
+    return false;
+  }
+}
+
+function logoutUser() {
+  currentUser = null;
+  activeRole = "researcher";
+  loginFormElement.reset();
+  registerFormElement.reset();
+  forgotPasswordFormElement.reset();
+  showAuthContainer();
+  showAuthForm("login");
+}
+
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.classList.add("show");
+  }, 100);
+
+  setTimeout(() => {
+    notification.classList.remove("show");
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
 navItems.forEach((item) => {
   item.addEventListener("click", () => setView(item.dataset.view));
 });
+
+// ============ AUTHENTICATION EVENT LISTENERS ============
+loginFormElement.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = loginEmailInput.value.trim();
+  const password = loginPasswordInput.value;
+
+  if (loginUser(email, password)) {
+    loginFormElement.reset();
+  } else {
+    showNotification("Invalid email or password!", "error");
+  }
+});
+
+registerFormElement.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = registerNameInput.value.trim();
+  const email = registerEmailInput.value.trim();
+  const password = registerPasswordInput.value;
+  const confirmPassword = registerConfirmPasswordInput.value;
+  const role = registerRoleSelect.value;
+
+  if (registerUser(name, email, password, confirmPassword, role)) {
+    registerFormElement.reset();
+  }
+});
+
+forgotPasswordFormElement.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = resetEmailInput.value.trim();
+  resetPassword(email);
+  forgotPasswordFormElement.reset();
+});
+
+registerLink.addEventListener("click", () => showAuthForm("register"));
+forgotPasswordLink.addEventListener("click", () => showAuthForm("forgotPassword"));
+backToLoginLink.addEventListener("click", () => showAuthForm("login"));
+backToLoginLink2.addEventListener("click", () => showAuthForm("login"));
+
+// Logout button
+const logoutBtn = document.querySelector("#logoutBtn");
+logoutBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to logout?")) {
+    logoutUser();
+  }
+});
+
+// ============ APP EVENT LISTENERS ============
 
 jumpButtons.forEach((button) => {
   button.addEventListener("click", () => setView(button.dataset.viewJump));
@@ -403,3 +598,7 @@ renderSavedSearches();
 renderEditorJournals();
 renderUsers();
 applyRole(activeRole);
+
+// Initialize: Show auth container, hide app shell
+showAuthContainer();
+showAuthForm("login");

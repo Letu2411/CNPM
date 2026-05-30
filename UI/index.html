@@ -7,7 +7,127 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="app-shell">
+    <!-- Authentication Section -->
+    <div class="auth-container" id="authContainer">
+      <!-- Login Form -->
+      <div class="auth-form active" id="loginForm">
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="auth-logo">ST</div>
+            <h1>SciPub Trends</h1>
+            <p>Publication Trend Tracking System</p>
+          </div>
+
+          <form id="loginFormElement" class="form-group">
+            <div class="form-field">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" placeholder="your.email@example.com" required />
+            </div>
+
+            <div class="form-field">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" placeholder="Enter your password" required />
+            </div>
+
+            <div class="form-checkbox">
+              <input type="checkbox" id="rememberMe" />
+              <label for="rememberMe">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn-primary full">Sign In</button>
+          </form>
+
+          <div class="form-divider">Or</div>
+
+          <div class="auth-links">
+            <button type="button" class="btn-link" id="forgotPasswordLink">Forgot your password?</button>
+            <button type="button" class="btn-link" id="registerLink">Create new account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div class="auth-form" id="registerForm">
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="auth-logo">ST</div>
+            <h1>Create Account</h1>
+            <p>Join SciPub Trends Community</p>
+          </div>
+
+          <form id="registerFormElement" class="form-group">
+            <div class="form-field">
+              <label for="registerName">Full Name</label>
+              <input type="text" id="registerName" placeholder="Your full name" required />
+            </div>
+
+            <div class="form-field">
+              <label for="registerEmail">Email Address</label>
+              <input type="email" id="registerEmail" placeholder="your.email@example.com" required />
+            </div>
+
+            <div class="form-field">
+              <label for="registerPassword">Password</label>
+              <input type="password" id="registerPassword" placeholder="Minimum 8 characters" minlength="8" required />
+            </div>
+
+            <div class="form-field">
+              <label for="registerConfirmPassword">Confirm Password</label>
+              <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" minlength="8" required />
+            </div>
+
+            <div class="form-field">
+              <label for="registerRole">Select Role</label>
+              <select id="registerRole" required>
+                <option value="">-- Choose your role --</option>
+                <option value="researcher">Researcher</option>
+                <option value="editor">Editor</option>
+              </select>
+            </div>
+
+            <div class="form-checkbox">
+              <input type="checkbox" id="agreeTerms" required />
+              <label for="agreeTerms">I agree to Terms of Service and Privacy Policy</label>
+            </div>
+
+            <button type="submit" class="btn-primary full">Create Account</button>
+          </form>
+
+          <div class="auth-links">
+            <button type="button" class="btn-link" id="backToLoginLink">Back to login</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forgot Password Form -->
+      <div class="auth-form" id="forgotPasswordForm">
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="auth-logo">ST</div>
+            <h1>Reset Password</h1>
+            <p>Enter your email to receive reset instructions</p>
+          </div>
+
+          <form id="forgotPasswordFormElement" class="form-group">
+            <div class="form-field">
+              <label for="resetEmail">Email Address</label>
+              <input type="email" id="resetEmail" placeholder="your.email@example.com" required />
+            </div>
+
+            <p class="form-hint">We'll send you an email with instructions to reset your password within a few minutes.</p>
+
+            <button type="submit" class="btn-primary full">Send Reset Link</button>
+          </form>
+
+          <div class="auth-links">
+            <button type="button" class="btn-link" id="backToLoginLink2">Back to login</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main App Section (Hidden initially) -->
+    <div class="app-shell" id="appShell" style="display: none;">
       <aside class="sidebar" aria-label="Application navigation">
         <a class="brand" href="#" data-view="dashboard" aria-label="SciPub Trends home">
           <span class="brand-mark">ST</span>
@@ -67,9 +187,12 @@
             <p class="eyebrow">Scientific Journal Publication Trend Tracking System</p>
             <h1 id="pageTitle">Research intelligence workspace</h1>
           </div>
-          <div class="user-chip" aria-label="Current user">
-            <span id="activeRole">Researcher</span>
-            <strong>User</strong>
+          <div class="user-section">
+            <div class="user-chip" aria-label="Current user">
+              <span id="activeRole">Researcher</span>
+              <strong>User</strong>
+            </div>
+            <button type="button" class="btn-logout" id="logoutBtn" title="Logout">Logout</button>
           </div>
         </header>
 
